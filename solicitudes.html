@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Gestión de Vacaciones</title>
+</head>
+<body>
+    <h1>Gestión de Vacaciones</h1>
+
+    <!-- Sección 1: Trabajadores -->
+    <h2>Trabajadores</h2>
+    <button id="btnCargarTrabajadores">Cargar Trabajadores</button>
+    <ul id="listaTrabajadores"></ul>
+
+    <hr>
+
+    <!-- Sección 2: Solicitudes -->
+    <h2>Solicitudes</h2>
+    <button id="btnCargarSolicitudes">Cargar Solicitudes</button>
+    <ul id="listaSolicitudes"></ul>
+
+    <hr>
+
+    <!-- Sección 3: Crear Solicitud -->
+    <h2>Crear Solicitud</h2>
+    <form id="formSolicitud">
+        <label>ID Trabajador: <input type="number" id="trabajador_id" required></label><br>
+        <label>Fecha Inicio: <input type="date" id="fecha_inicio" required></label><br>
+        <label>Fecha Fin: <input type="date" id="fecha_fin" required></label><br>
+        <label>Cantidad Horas (opcional): <input type="number" id="cantidad_horas"></label><br>
+        <button type="submit">Crear Solicitud</button>
+    </form>
+
+    <script>
+        const listaTrabajadores = document.getElementById('listaTrabajadores');
+        const listaSolicitudes = document.getElementById('listaSolicitudes');
+
+        // --- Cargar trabajadores ---
+        async function cargarTrabajadores() {
+            listaTrabajadores.innerHTML = '';
+            const res = await fetch('http://localhost:3000/trabajador');
+            const trabajadores = await res.json();
+            trabajadores.forEach(t => {
+                const li = document.createElement('li');
+                li.textContent = `ID: ${t.codigo}, ${t.nombre}, CI: ${t.cedula_identidad}, Área: ${t.area}, Cargo: ${t.cargo}`;
+                listaTrabajadores.appendChild(li);
+            });
+        }
+
+        document.getElementById('btnCargarTrabajadores').addEventListener('click', cargarTrabajadores);
+
+        // --- Cargar solicitudes ---
+        async function cargarSolicitudes() {
+            listaSolicitudes.innerHTML = '';
+            const res = await fetch('http://localhost:3000/solicitud');
+            const solicitudes = await res.json();
+            solicitudes.forEach(s => {
+                const li = document.createElement('li');
+                li.textContent = `ID: ${s.solicitud_id}, Trabajador ID: ${s.trabajador_id}, ${s.fecha_inicio} a ${s.fecha_fin}, Días: ${s.cantidad_dias}, Estado: ${s.estado}`;
+
+                const btnAprobar = document.createElement('button');
+                btnAprobar.textContent = 'Aprobar';
+                btnAprobar.onclick = () => actualizarEstado(s.solicitud_id, 'aprobada');
+
+                const btnRechazar = document.createElement('button');
+                btnRechazar.textContent = 'Rechazar';
+                btnRechazar.onclick = () => actualizarEstado(s.solicitud_id, 'rechazada');
+
+                li.appendChild(btnAprobar);
+                li.appendChild(btnRechazar);
+                listaSolicitudes.appendChild(li);
+            });
+        }
+
+        document.getElementById('btnCargarSolicitudes').addEventListener('click', cargarSolicitudes);
+
+        // --- Crear solicitud ---
+        document.getElementById('formSolicitud').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const trabajador_id = document.getElementById('trabajador_id').value;
+            const fecha_inicio = document.getElementById('fecha_inicio').value;
+            const fecha_fin = document.getElementById('fecha_fin').value;
+            const cantidad_horas = document.getElementById('cantidad_horas').value;
+
+            const payload = { trabajador_id, fecha_inicio, fecha_fin };
+            if (cantidad_horas) payload.cantidad_horas = cantidad_horas;
+
+            const res = await fetch('http://localhost:3000/solicitud', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            const data = await res.json();
+            alert(res.ok ? `Solicitud creada ID ${data.solicitud_id}` : data.error);
+            cargarSolicitudes();
+        });
+
+        // --- Aprobar / Rechazar ---
+        async function actualizarEstado(id, estado) {
+            const res = await fetch(`http://localhost:3000/solicitud/${id}/${estado}`, { method: 'PUT' });
+            const data = await res.json();
+            alert(res.ok ? data.message : data.error);
+            cargarSolicitudes();
+        }
+
+        // --- Cargar automáticamente al iniciar ---
+        cargarTrabajadores();
+        cargarSolicitudes();
+    </script>
+</body>
+</html>

@@ -1,5 +1,6 @@
 const express = require('express')
 const fs = require('fs') //debug
+const path = require('path')
 
 const Database = require("./Database");
 
@@ -13,6 +14,10 @@ const db = new Database({
 	database: "gestion_vacaciones"
 });
 
+//solo para ver 
+app.get('/', (req,res)=>{
+	res.sendFile(path.join(__dirname, '', 'solicitudes.html'));
+})
 
 //vre todos los trabajadores
 app.get("/trabajador", async (req, res) => {
