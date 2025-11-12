@@ -17,6 +17,11 @@ curl -X GET http://localhost:3000/trabajador
 por id
 curl -X GET http://localhost:3000/trabajador/1
 
+ver el acumulado de un trabajador
+
+curl -X GET http://localhost:3000/trabajador/1/vacaciones
+
+
 crear solicitud de vacaciones
 
 curl -X POST http://localhost:3000/solicitud \

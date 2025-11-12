@@ -33,6 +33,53 @@ app.get("/trabajador/:id", async (req, res) => {
 
 });
 
+
+app.get("/trabajador/:id/vacaciones", async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const trabajador = await db.query(
+            "SELECT * FROM trabajador WHERE codigo = ?",
+            [id]
+        );
+
+        if (trabajador.length === 0) {
+            return res.status(404).json({ error: "Trabajador no encontrado" });
+        }
+
+        const vac = await db.query(
+            "SELECT dias_acumulados, dias_tomados, dias_disponibles FROM vacaciones_acumuladas WHERE trabajador_id = ?",
+            [id]
+        );
+
+        let total_acumulados = 0, total_tomados = 0, total_disponibles = 0;
+        vac.forEach(v => {
+            total_acumulados += parseFloat(v.dias_acumulados);
+            total_tomados += parseFloat(v.dias_tomados);
+            total_disponibles += parseFloat(v.dias_disponibles);
+        });
+
+        res.json({
+            trabajador: {
+                codigo: trabajador[0].codigo,
+                nombre: trabajador[0].nombre,
+                cedula_identidad: trabajador[0].cedula_identidad,
+                area: trabajador[0].area,
+                cargo: trabajador[0].cargo
+            },
+            vacaciones: vac,
+            totales: {
+                total_acumulados,
+                total_tomados,
+                total_disponibles
+            }
+        });
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Error al obtener vacaciones" });
+    }
+});
 //crear trabajador
 app.post("/trabajador", async (req, res) => {
 	try {
