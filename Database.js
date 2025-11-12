@@ -4,6 +4,8 @@ class Database {
     constructor(config) {
         this.config = config;
         this.connection = null;
+
+		this.connect();
     }
 
     async connect() {
