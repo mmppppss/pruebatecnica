@@ -14,12 +14,13 @@ const db = new Database({
 });
 
 
-
+//vre todos los trabajadores
 app.get("/trabajador", async (req, res) => {
 	const rows = await db.query("SELECT * FROM trabajador");
 	res.json(rows);
 });
 
+//ver trabajador por id
 app.get("/trabajador/:id", async (req, res) => {
 	const { id } = req.params;
 	const trabajador = await db.query("SELECT * FROM trabajador WHERE codigo = ?", [id]);
@@ -32,6 +33,7 @@ app.get("/trabajador/:id", async (req, res) => {
 
 });
 
+//crear trabajador
 app.post("/trabajador", async (req, res) => {
 	try {
 		const { cedula_identidad, nombre, fecha_ingreso, area, cargo } = req.body;
@@ -59,8 +61,7 @@ app.post("/trabajador", async (req, res) => {
 });
 
 
-
-
+//ver solicitudes
 app.get("/solicitud", async (req, res) => {
 	try {
 
@@ -88,6 +89,7 @@ app.get("/solicitud", async (req, res) => {
 	}
 });
 
+//ver solicitudes por id
 app.get("/solicitud/:id", async (req, res) => {
 	try {
 
@@ -119,7 +121,7 @@ app.get("/solicitud/:id", async (req, res) => {
 
 
 
-
+//crear solicitudes
 app.post("/solicitud", async (req, res) => {
 	try {
 		const { trabajador_id, fecha_inicio, fecha_fin, cantidad_dias, cantidad_horas } = req.body;
@@ -166,6 +168,8 @@ app.post("/solicitud", async (req, res) => {
 });
 
 
+//aprobar / rechazar solicitudes
+//se debe enviar el id y el estado aprobada o rechazada
 
 app.put("/solicitud/:id/:estado", async (req, res) => {
 	try {
