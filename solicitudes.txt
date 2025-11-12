@@ -1,0 +1,51 @@
+Crear trabajador
+
+curl -X POST http://localhost:3000/trabajador \
+-H "Content-Type: application/json" \
+-d '{
+    "cedula_identidad": "1234567",
+    "nombre": "Pedro Pozo",
+    "fecha_ingreso": "2021-02-10",
+    "area": "Sistemas",
+    "cargo": "Backend"
+}'
+
+Listar todos los trabajadores
+
+curl -X GET http://localhost:3000/trabajador
+
+por id
+curl -X GET http://localhost:3000/trabajador/1
+
+crear solicitud de vacaciones
+
+curl -X POST http://localhost:3000/solicitud \
+-H "Content-Type: application/json" \
+-d '{
+    "trabajador_id": 3,
+    "fecha_inicio": "2025-11-15",
+    "fecha_fin": "2025-11-20"
+}'
+
+Crear solicitud usando horas
+
+curl -X POST http://localhost:3000/solicitud \
+-H "Content-Type: application/json" \
+-d '{
+    "trabajador_id": 1,
+    "fecha_inicio": "2025-11-15",
+    "fecha_fin": "2025-11-15",
+    "cantidad_horas": 4
+}'
+
+Listar todas las solicitudes
+
+curl -X GET http://localhost:3000/solicitud
+
+
+aprobar/rechazar solicitud por ID
+
+curl -X PUT http://localhost:3000/solicitud/1/aprobada
+
+curl -X PUT http://localhost:3000/solicitud/1/rechazada
+
